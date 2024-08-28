@@ -118,15 +118,22 @@ function Calendar(props: Props) {
                               }px`;
 
                               const title = box.appendChild(textContent);
-                              title.classList.add("overlay");
 
-                              title.innerHTML = `<strong>${table.unitId} ${
+                              if (tableIdx <= 2) {
+                                title.classList.add("overlay-bottom");
+                              } else {
+                                title.classList.add("overlay-top");
+                              }
+
+                              title.innerHTML = `<div><strong>${table.unitId} ${
                                 table.unitName
                               }</strong><p>${dayjs(res[0]).format(
                                 "YY.MM.DD"
                               )} ~ ${dayjs(res[res.length - 1]).format(
                                 "YY.MM.DD"
-                              )}</p><strong>${table.name}<strong>`;
+                              )}</p><strong>${
+                                table.name
+                              }<strong></div><button>상세</button>`;
                             }
 
                             const element = document.getElementById(
