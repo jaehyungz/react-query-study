@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import React, {
   memo,
   useCallback,
@@ -36,7 +36,10 @@ const getDateRange = (startDate: string, endDate: string) => {
 function Calendar(props: Props) {
   console.log("!");
   const {} = props;
+
   const scrollDivRef = useRef<HTMLDivElement | null>(null);
+  const itemRef = useRef({});
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -45,13 +48,27 @@ function Calendar(props: Props) {
     undefined
   );
 
+  const dateRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const getSearchDays = useCallback(() => {
+    console.log(getDateRange(props.startedAt, props.endedAt).length);
     return {
       searchDays: getDateRange(props.startedAt, props.endedAt),
     };
-  }, []);
+  }, [props.startedAt, props.endedAt]);
 
   const { searchDays } = getSearchDays();
+
+  useEffect(() => {
+    dateRefs.current = dateRefs.current.slice(
+      0,
+      tableData.length * searchDays.length
+    );
+  }, [tableData, searchDays]);
+
+  useEffect(() => {
+    console.log(dateRefs);
+  }, [dateRefs]);
 
   // const [selectDays,]
 
@@ -110,7 +127,7 @@ function Calendar(props: Props) {
       box?.setAttribute("class", "col-hover-box");
     };
 
-    if (target === "row") setCurrentRowIdx(undefined);
+    // if (target === "row") setCurrentRowIdx(undefined);
 
     if (target === "all") {
       Object.values(hoverBoxes).forEach(setClass);
@@ -125,8 +142,6 @@ function Calendar(props: Props) {
 
     return res;
   }, [searchDays.length]);
-
-  const currentWidth = useMemo(() => {}, []);
 
   const removeClass = (className: string) => {
     const activeContract = document.querySelectorAll(".active-contract");
@@ -170,13 +185,18 @@ function Calendar(props: Props) {
 
   const handleClickUnit = (idx: number) => () => {
     //전에 클릭한 호실을 다시 클릭할때
-    if (currentRowIdx === idx) return removeHoverBox("row");
 
-    removeHoverBox("row");
+    const el = document.querySelectorAll(".row-visible");
 
-    setCurrentRowIdx(idx);
+    el.forEach((e) => e.classList.replace("row-visible", "row-hover-box"));
 
-    const dataLength = searchDays.length;
+    // if (currentRowIdx === idx) return removeHoverBox("row");
+
+    // removeHoverBox("row");
+
+    // setCurrentRowIdx(idx);
+
+    // const dataLength = searchDays.length;
 
     const hoverBox = document
       .getElementById(`${props.startedAt}-${idx}`)
@@ -321,6 +341,12 @@ function Calendar(props: Props) {
                     <div
                       key={`${date}-${tableIdx}`}
                       id={`${date}-${tableIdx}`}
+                      ref={(el) => {
+                        dateRefs.current[
+                          tableIdx * searchDays.length + rowIdx
+                        ] = el;
+                      }}
+                      // ref={el => itemRef[idx] = el}
                       className={`date-item
                         ${
                           isReady
@@ -355,6 +381,8 @@ function Calendar(props: Props) {
                           if (res.includes(date)) {
                             res.map((item, idx) => {
                               if (idx === 0) {
+                                // const element = dateRefs.current[2267];
+
                                 const element = document.getElementById(
                                   `${item}-${tableIdx}`
                                 );
@@ -382,7 +410,7 @@ function Calendar(props: Props) {
                                   );
                                 });
 
-                                content.innerHTML = `<div><strong>${
+                                content.innerHTML = `<div class="text-tooltip"><strong>${
                                   table.unitId
                                 } ${table.unitName}</strong><p>${dayjs(
                                   res[0]
@@ -402,6 +430,8 @@ function Calendar(props: Props) {
                         }
                       }}
                     >
+                      {tableIdx * searchDays.length + rowIdx}
+                      {/* {tableIdx}-{rowIdx} */}
                       <div
                         className="col-hover-box"
                         onClick={(e) => {
@@ -432,7 +462,6 @@ function Calendar(props: Props) {
           })}
         </div>
       </div>
-      <p>rowKey:{currentRowIdx}</p>
     </>
   );
 }

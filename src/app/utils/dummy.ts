@@ -10,7 +10,7 @@ export const tableData = [
     id: 1,
     unitId: "Seocho393",
     unitName: "311호",
-    name: "Antonio shumago",
+    name: "Antonio shumagoAntonio shumago",
     contractDates: [
       {
         startedAt: "2024-08-28",

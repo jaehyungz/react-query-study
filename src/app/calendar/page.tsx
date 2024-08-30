@@ -21,7 +21,7 @@ function CalendarPage(props: Props) {
     setLoading(true);
     const res =
       type === "add"
-        ? dayjs(state.startedAt).add(month, "month")
+        ? dayjs(state.endedAt).add(month, "month")
         : dayjs(state.startedAt).subtract(month, "month");
     type === "add"
       ? setState((prev) => ({
