@@ -35,8 +35,6 @@ export const ClientProvider: React.FC<React.PropsWithChildren> = ({
   );
   // const queryClient = getQueryClient();
 
-  console.log(queryClient);
-
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

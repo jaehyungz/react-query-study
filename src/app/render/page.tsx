@@ -6,13 +6,15 @@ interface Props {}
 
 function RenderPage(props: Props) {
   const {} = props;
-  const [state, setState] = useState(0);
+
+  const [state, setState] = useState({
+    startedAt: "2024-08-28",
+    endedAt: "2024-12-31",
+  });
 
   return (
     <div>
-      <button onClick={() => setState((prev) => prev - 1)}>-1</button>
-      <button onClick={() => setState((prev) => prev + 1)}>+1</button>
-      {state}
+      {/* <RenderComponent startedAt={state.startedAt} endedAt={state.endedAt} /> */}
       <RenderComponent />
     </div>
   );
