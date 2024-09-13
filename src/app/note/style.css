@@ -1,0 +1,31 @@
+.note-container {
+  display: flex;
+  flex-direction: column;
+  overflow-x: scroll;
+  flex-wrap: wrap;
+  white-space: nowrap;
+  width: 1200px;
+  border: 1px solid;
+}
+
+.date-row {
+  display: flex;
+  gap: 4px;
+
+  .item {
+    width: 80px;
+    height: 80px;
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.dates {
+  display: flex;
+  gap: 4px;
+  span {
+    width: 80px;
+    text-align: center;
+  }
+}

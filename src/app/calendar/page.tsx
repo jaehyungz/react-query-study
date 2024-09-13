@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 
 import "./style.css";
 import Calendar from "../components/Calendar";
@@ -12,8 +12,10 @@ function CalendarPage(props: Props) {
   const {} = props;
 
   const [state, setState] = useState({
-    startedAt: "2024-08-28",
-    endedAt: "2024-12-31",
+    // startedAt: "2024-09-04",
+    // endedAt: "2024-09-05",
+    startedAt: dayjs().subtract(1, "month").format("YYYY-MM-DD"),
+    endedAt: dayjs().add(1, "day").format("YYYY-MM-DD"),
   });
   const [loading, setLoading] = useState(true);
 

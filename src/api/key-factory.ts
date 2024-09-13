@@ -7,8 +7,9 @@ import {
 import { getUsersFn, getUserFn } from "./queries";
 import {} from "./queries";
 import { getEmployeesFn } from "./queries/employee";
-import { UseQueryOptions } from "@tanstack/react-query";
+import { UseMutationOptions, UseQueryOptions } from "@tanstack/react-query";
 import { getPostsFn } from "./queries/posts";
+import { createAccessTokenFn } from "./queries/auth/queries";
 
 const userKeys = createQueryKeys("users", {
   list: () => ({
@@ -39,6 +40,26 @@ const postKeys = createQueryKeys("post", {
   }),
 });
 
-export const queryKeys = mergeQueryKeys(userKeys, employeeKeys, postKeys);
+// const authKeys = createQueryKeys("auth", {
+//   login: {
+//     queryKey: ["createAccessToken"],
+//     queryFn: (() => createAccessTokenFn()) as UseMutationOptions["mutationFn"],
+//   },
+
+//   // mutationKey: ["createAccessToken"],
+//   // mutationFn: () => createAccessTokenFn(),
+
+//   // list: (pageNum) => ({
+//   //   mutationKey: ["getPosts", pageNum],
+//   //   mutationFn: () => getPostsFn(pageNum),
+//   // }),
+// });
+
+export const queryKeys = mergeQueryKeys(
+  userKeys,
+  employeeKeys,
+  postKeys
+  // authKeys
+);
 
 export type QueryKeys = inferQueryKeyStore<typeof queryKeys>;

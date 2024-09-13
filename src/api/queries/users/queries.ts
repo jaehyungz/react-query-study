@@ -9,7 +9,7 @@ const getUsers = () => {
     placeholderData: [],
     staleTime: 1000 * 60 * 60,
     // staleTime: 1000,
-    // gcTime: 1000 * 60,
+    // gcTime: 1000 *sd 60,
     // networkMode: "offlineFirst",
     // networkMode: "online",
   });

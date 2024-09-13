@@ -15,7 +15,11 @@ function RenderPage(props: Props) {
   return (
     <div>
       {/* <RenderComponent startedAt={state.startedAt} endedAt={state.endedAt} /> */}
-      <RenderComponent />
+      <RenderComponent
+        startedAt={state.startedAt}
+        endedAt={state.endedAt}
+        active
+      />
     </div>
   );
 }

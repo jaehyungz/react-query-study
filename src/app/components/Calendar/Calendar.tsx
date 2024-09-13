@@ -12,7 +12,7 @@ import React, {
 
 import "./style.css";
 import dayjs from "dayjs";
-import { tableData, tableType } from "@/app/utils/dummy";
+import { tableData as data, tableType } from "@/app/utils/dummy";
 import { usePathname, useRouter } from "next/navigation";
 import { createRoot, Root } from "react-dom/client";
 import RoomItem from "../RoomItem";
@@ -41,7 +41,18 @@ function Calendar(props: Props) {
 
   const scrollDivRef = useRef<HTMLDivElement | null>(null);
 
+  const [searchDate, setSearchDate] = useState(props);
+
   const dateRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const initialData: tableType[] = [
+    {
+      id: 0,
+      unitId: "",
+      unitName: "",
+      name: "",
+      contractDates: [],
+    },
+  ];
 
   const [activeDates, setActiveDates] = useState<{
     dates: string[];
@@ -50,25 +61,45 @@ function Calendar(props: Props) {
     dates: [],
     key: -1,
   });
+  const [tableData, setTableData] = useState<tableType[]>(initialData);
 
   const [currentEmptyRoom, setCurrentEmptyRoom] = useState({
     date: "",
     key: -1,
   });
 
+  const [currentDate, setCurrentDate] = useState({
+    date: "",
+    key: -1,
+  });
+
   const getSearchDays = useCallback(() => {
-    return {
-      searchDays: getDateRange(props.startedAt, props.endedAt),
-    };
-  }, [props.startedAt, props.endedAt]);
+    return getDateRange(searchDate.startedAt, searchDate.endedAt);
+  }, [searchDate.startedAt, searchDate.endedAt]);
 
-  const { searchDays } = getSearchDays();
+  // const { searchDays } = getSearchDays();
+  const searchDays = useMemo(() => getSearchDays(), [getSearchDays]);
 
-  const fullWidth = useMemo(() => {
-    const res = 40 * searchDays.length + 4 * (searchDays.length - 1);
+  useEffect(() => {
+    setTimeout(() => {
+      setTableData(data);
+    }, 500);
+  }, []);
 
-    return res;
-  }, [searchDays.length]);
+  useEffect(() => {
+    //2번렌더의 이유는 객체키값만큼 순회
+
+    setSearchDate(props);
+  }, [props]);
+
+  useEffect(() => {
+    if (currentDate.key >= -1) removeHoverBox();
+  }, [searchDate]);
+
+  // useEffect(() => {
+  //   console.log("searchDate바뀜");
+  //   // removeHoverBox();
+  // }, [searchDate]);
 
   // useEffect(() => {
   //   dateRefs.current = dateRefs.current.slice(
@@ -76,8 +107,6 @@ function Calendar(props: Props) {
   //     tableData.length * searchDays.length
   //   );
   // }, [tableData, searchDays]);
-
-  const [isReady, setIsReady] = useState(true);
 
   useEffect(() => {
     const full = scrollDivRef.current?.scrollWidth;
@@ -87,95 +116,62 @@ function Calendar(props: Props) {
     // });
   }, []);
 
-  const [dateKey, setDateKey] = useState(-1);
-
+  // 달의 첫날 가져오기
   const getFirstDays = () => {
-    const res = getDateRange(props.startedAt, props.endedAt);
-
+    const res = getDateRange(searchDate.startedAt, searchDate.endedAt);
+    //TODO:일자기준이 아니라 달의 기준으로 첫날구하기
     const firstDays = res.filter((item) => dayjs(item).format("DD") === "01");
 
     return firstDays;
   };
 
-  // 글로벌 유틸함수 -----------------------------
-
+  // 날짜 오버레이 지우기
   const removeHoverBox = () => {
-    setDateKey(-1);
+    setCurrentDate({
+      date: "",
+      key: -1,
+    });
   };
 
+  //방 클릭시 active값 지우기
   const resetActiveBox = () => {
     setCurrentEmptyRoom({
       date: "",
       key: -1,
     });
     setActiveDates({ dates: [], key: -1 });
+  };
 
-    const activeContract = document.querySelectorAll(".active-contract");
-    activeContract.forEach((item) => {
-      item.classList.toggle("active-contract");
+  // 날짜 클릭시 콜백
+  const handleClickDate = (date: string, idx: number) => () => {
+    resetActiveBox();
+    setCurrentDate({
+      date,
+      key: idx,
     });
   };
 
-  const handleClickDate = (date: string, idx: number) => () => {
-    resetActiveBox();
-
-    setDateKey(idx);
-
-    console.log(date);
-    console.log(idx);
-  };
-
-  // const handleClickUnit = (idx: number) => () => {
-  //   //전에 클릭한 호실을 다시 클릭할때
-
-  //   const el = document.querySelector(`.idx-${idx}`);
-  //   const visible = document.querySelector(".row-visible");
-
-  //   if (visible) {
-  //     console.log("이미있는애들만");
-  //     visible.remove();
-
-  //     // visible.forEach((a) => {
-  //     //   console.log();
-  //     //   a.remove();
-  //     // });
-  //   }
-
-  //   if (el) {
-  //     console.log("토글");
-  //   }
-
-  //   const findIdx = idx * searchDays.length;
-  //   // const hoverBox = dateRefs.current[findIdx];
-
-  //   // if (hoverBox) {
-  //   //   const root = createRoot(hoverBox);
-
-  //   //   const contents = createElement("div", {
-  //   //     className: `row-hover-box row-visible idx-${idx}`,
-  //   //     style: {
-  //   //       width: `${fullWidth}px`,
-  //   //     },
-  //   //   });
-
-  //   //   root.render(contents);
-  //   // }
-  // };
-
-  const handleScroll = () => {};
-
+  // 방클릭시 콜백
   const handleClick = (
     dates: string[],
     tableIdx: number,
     isEmpty?: boolean
   ) => {
     if (isEmpty) {
+      if (
+        currentEmptyRoom.key === tableIdx &&
+        currentEmptyRoom.date === dates[0]
+      )
+        return;
+
+      console.log("여기까지 오잖아");
       setCurrentEmptyRoom({
         date: dates[0],
         key: tableIdx,
       });
       return;
     }
+    // toggle 기능을 위한 로직
     if (activeDates.key === tableIdx && activeDates.dates[0] === dates[0])
       return;
     setActiveDates({
@@ -183,10 +179,36 @@ function Calendar(props: Props) {
       key: tableIdx,
     });
   };
+
+  // row 마다 예약일,예약첫일,청소일 배열 리턴
+  function getContractInfo(table: tableType) {
+    let contractDates: string[] = [];
+    let firstDates: string[] = [];
+    let cleanupDays: string[] = [];
+    let fakeFirstDates: string[] = [];
+
+    table.contractDates.forEach((contractDate, contractIdx) => {
+      const res = getDateRange(contractDate.startedAt, contractDate.endedAt);
+
+      const lastday = res[res.length - 1];
+      const result = getDateRange(
+        dayjs(lastday).add(1, "day").format("YYYY-MM-DD"),
+        dayjs(lastday).add(2, "day").format("YYYY-MM-DD")
+      );
+
+      fakeFirstDates = [
+        ...fakeFirstDates,
+        searchDays.includes(res[0]) ? res[0] : searchDays[0],
+      ];
+      firstDates = [...firstDates, res[0]];
+      cleanupDays = [...cleanupDays, ...result];
+      contractDates = [...contractDates, ...res];
+    });
+    return { contractDates, firstDates, cleanupDays, fakeFirstDates };
+  }
+
   return (
     <>
-      <button onClick={handleScroll}>스크롤 이동</button>
-
       <div className="calendar-container">
         <div className="unit">
           <div />
@@ -207,7 +229,7 @@ function Calendar(props: Props) {
               return (
                 <div
                   key={item}
-                  className={`date-item date-view ${isFirst ? "first" : ""}`}
+                  className={`date-view ${isFirst ? "first" : ""}`}
                   onClick={handleClickDate(item, idx)}
                 >
                   {isFirst ? (
@@ -222,27 +244,8 @@ function Calendar(props: Props) {
             })}
           </div>
           {tableData.map((table, tableIdx) => {
-            let contractDates: string[] = [];
-            let firstDate: string[] = [];
-            let cleanupdays: string[] = [];
-            let currentDate: string[] = [];
-
-            table.contractDates.map((contractDate) => {
-              const res = getDateRange(
-                contractDate.startedAt,
-                contractDate.endedAt
-              );
-
-              const lastday = res[res.length - 1];
-              const result = getDateRange(
-                dayjs(lastday).add(1, "day").format("YYYY-MM-DD"),
-                dayjs(lastday).add(2, "day").format("YYYY-MM-DD")
-              );
-
-              firstDate = [...firstDate, res[0]];
-              cleanupdays = [...cleanupdays, ...result];
-              contractDates = [...contractDates, ...res];
-            });
+            const { contractDates, firstDates, cleanupDays, fakeFirstDates } =
+              getContractInfo(table);
 
             return (
               <div className="date-row" key={table.id}>
@@ -252,13 +255,15 @@ function Calendar(props: Props) {
                   // 계약일에 포함되어있는지
                   let isIclude = contractDates.includes(date);
                   // 계약일중 첫날인지
-                  let isFirst = firstDate.includes(date);
+                  let isFirst = firstDates.includes(date);
                   // 지금 클릭한 날짜가 계약일에 포함되어있는지
                   let isActiveContract =
                     activeDates.key === tableIdx &&
                     activeDates.dates.includes(date);
                   // 계약만료후 이틀의 공실인지
-                  let isCleanupday = cleanupdays.includes(date);
+                  let isCleanupday = cleanupDays.includes(date);
+
+                  let isFakeFirst = fakeFirstDates.includes(date);
 
                   return (
                     <RoomItem
@@ -267,19 +272,20 @@ function Calendar(props: Props) {
                       rowIdx={rowIdx}
                       tableIdx={tableIdx}
                       searchDays={searchDays}
-                      dateKey={dateKey}
+                      currentDate={currentDate}
                       table={table}
                       date={date}
                       isIclude={isIclude}
                       isFirst={isFirst}
+                      isFakeFirst={isFakeFirst}
                       isActiveContract={isActiveContract}
                       isCleanupday={isCleanupday}
                       isEmpty={
                         tableIdx === currentEmptyRoom.key &&
                         currentEmptyRoom.date === date
                       }
-                      handleResetCol={removeHoverBox}
                       onClick={handleClick}
+                      handleResetCol={removeHoverBox}
                       handleResetActive={resetActiveBox}
                     />
                   );
@@ -293,4 +299,4 @@ function Calendar(props: Props) {
   );
 }
 
-export default memo(Calendar);
+export default Calendar;
