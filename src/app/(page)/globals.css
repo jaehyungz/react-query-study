@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid blue;
+  max-width: 552px;
+  margin: 0 auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  width: 100%;
+  border: 1px solid red;
+  box-sizing: border-box;
+  margin: 40px 0px 120px;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.user-item {
+  display: flex;
+  padding: 18px;
+  img {
+    border-radius: 100%;
+  }
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  .text {
+    padding: 0px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  a {
+    margin-left: auto;
+  }
+}
+
+.grid-list {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+
+  .box {
+    border: 1px solid;
+  }
+}
+
+.post-list {
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  .box {
+    display: flex;
+    flex-direction: column;
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      .item {
+        border: 1px solid;
+      }
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+      button {
+        width: 120px;
+        height: 40px;
+      }
+    }
+  }
+}

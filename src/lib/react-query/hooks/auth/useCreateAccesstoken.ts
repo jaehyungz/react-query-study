@@ -1,4 +1,4 @@
-import { fetcher } from "@/lib";
+import { fetcher, mutationKeys } from "@/lib";
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import {
   useCreateAccesstokenReponse,
@@ -13,7 +13,7 @@ export const useCreateAccesstoken = (
   >
 ) => {
   return useMutation({
-    mutationKey: ["createAccessToken"],
+    mutationKey: mutationKeys.signIn,
     mutationFn: createAccessToken,
     ...options,
   });

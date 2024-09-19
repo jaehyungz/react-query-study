@@ -3,33 +3,26 @@
 import {
   QueryCache,
   QueryClient,
+  QueryClientConfig,
   QueryClientProvider,
-  queryOptions,
 } from "@tanstack/react-query";
 
 import React, { useMemo } from "react";
-import { redirect } from "next/dist/server/api-utils";
-import { usePathname, useRouter } from "next/navigation";
-import queryClientOptions from "./options";
+import useApiError from "@/app/hooks/useApiError";
 
-function makeQueryClient() {
-  return new QueryClient(queryClientOptions);
+function makeQueryClient(options: QueryClientConfig) {
+  return new QueryClient(options);
 }
 
 let browserQueryClient: QueryClient | undefined = undefined;
-let browserQueryCache: QueryCache | undefined = undefined;
 
-export function getQueryClient() {
+export function getQueryClient(options: QueryClientConfig) {
+  //서버
   if (typeof window === "undefined") {
-    // Server: always make a new query client
-
-    return makeQueryClient();
+    return makeQueryClient(options);
   } else {
-    // Browser: make a new query client if we don't already have one
-    // This is very important so we don't re-make a new client if React
-    // suspends during the initial render. This may not be needed if we
-    // have a suspense boundary BELOW the creation of the query client
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    //클라이언트
+    if (!browserQueryClient) browserQueryClient = makeQueryClient(options);
     return browserQueryClient;
   }
 }
@@ -37,7 +30,37 @@ export function getQueryClient() {
 export const ClientProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const queryClient = getQueryClient();
+  const { handleError } = useApiError();
+
+  const options: QueryClientConfig = {
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        handleError(error);
+      },
+    }),
+
+    defaultOptions: {
+      queries: {
+        // staleTime: 1000 * 60 * 5,
+
+        // retry: 1,
+        retry: false,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+      },
+
+      // dehydrate: {
+      //   // per default, only successful Queries are included,
+      //   // this includes pending Queries as well
+      //   shouldDehydrateQuery: (query: Query) => {
+      //     return true;
+      //     // defaultShouldDehydrateQuery(query) || query.state.status === "pending",
+      //   },
+      // },
+    },
+  };
+
+  const queryClient = getQueryClient(options);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
