@@ -7,7 +7,7 @@ import "./style.css";
 import { useRouter } from "next/navigation";
 import { useCreateUser } from "@/lib/react-query/hooks/user/useCreateUser";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib";
 
 interface Props {}
@@ -19,7 +19,9 @@ function Page(props: Props) {
 
   const [skip, setSkip] = useState(0);
 
-  const { data } = useGetUsers(skip.toString());
+  const { data } = useGetUsers(skip.toString(), {
+    placeholderData: keepPreviousData,
+  });
 
   const { mutate } = useCreateUser({
     onSuccess: (data) => {

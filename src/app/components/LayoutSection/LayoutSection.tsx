@@ -16,24 +16,24 @@ interface Props {
 
 const paths = [
   {
-    label: "차트",
-    value: "chart",
-  },
-  {
     label: "맵",
-    value: "map",
+    value: "/map",
   },
   {
     label: "스티키",
-    value: "sticky",
+    value: "/sticky",
   },
   {
     label: "유저정보",
-    value: "user-info",
+    value: "/user-info",
   },
   {
     label: "캘린더",
-    value: "calendar",
+    value: "/calendar",
+  },
+  {
+    label: "차트",
+    value: "/chart",
   },
 ];
 
@@ -46,6 +46,7 @@ function LayoutSection({ children }: Props) {
 
   const { data } = useGetUserInfo({
     // retry: true,
+    refetchOnWindowFocus: true,
   });
 
   const handleAuth = () => {
